@@ -6,13 +6,17 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const (
+	PersonsTable  string = "persons"
+	GiftInfoTable string = "giftinfo"
+)
 
 func CreatePersonsTable(db *sql.DB) {
 	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INTEGER PRIMARY KEY,
 		firstname TEXT,
 		lastname TEXT)`,
-		"persons")
+		PersonsTable)
 	statement, err := db.Prepare(query)
 	if err != nil {
 		panic(err)
@@ -26,7 +30,7 @@ func CreateGiftedTable(db *sql.DB) {
 		to_person INTEGER,
 		year INTEGER,
 		gift TEXT)`,
-		"giftinfo")
+		GiftInfoTable)
 	statement, err := db.Prepare(query)
 	if err != nil {
 		panic(err)
@@ -45,13 +49,18 @@ func AddPerson(db *sql.DB, person Person) {
 }
 
 func AddGiftedInfo(db *sql.DB, info GiftedInfo) {
-	statement, err := db.Prepare(`INSERT INTO persons (
+	query := fmt.Sprintf(`INSERT INTO %s (
 		from_person, to_person, year, gift) 
-		VALUES (?, ?, ?, ?)`)
+		VALUES (?, ?, ?, ?)`, GiftInfoTable)
+	statement, err := db.Prepare(query)
 	if err != nil {
 		panic(err)
 	}
 	statement.Exec(info.from_person, info.to_person, info.year, info.gift)
+}
+
+func MakeEvent(db *sql.DB) {
+	
 }
 
 type Person struct {
@@ -67,9 +76,16 @@ type GiftedInfo struct {
 	gift        string
 }
 
+type Event struct {
+	year     uint
+	persons  []Person
+	database *sql.DB
+}
+
 func main() {
 	database, _ := sql.Open("sqlite3", "./party.db")
 	CreatePersonsTable(database)
 	CreateGiftedTable(database)
 	AddPerson(database, Person{"Jhon", "Doe"})
+	AddGiftedInfo(database, GiftedInfo{1, 2, 2011, "True Gift"})
 }
