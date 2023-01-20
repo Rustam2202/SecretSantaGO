@@ -3,7 +3,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
+	"text/template"
+
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -60,7 +64,7 @@ func AddGiftedInfo(db *sql.DB, info GiftedInfo) {
 }
 
 func MakeEvent(db *sql.DB) {
-	
+
 }
 
 type Person struct {
@@ -82,10 +86,35 @@ type Event struct {
 	database *sql.DB
 }
 
+var tpl *template.Template
+
 func main() {
+
 	database, _ := sql.Open("sqlite3", "./party.db")
 	CreatePersonsTable(database)
 	CreateGiftedTable(database)
-	AddPerson(database, Person{"Jhon", "Doe"})
-	AddGiftedInfo(database, GiftedInfo{1, 2, 2011, "True Gift"})
+	//AddPerson(database, Person{"Jhon", "Doe"})
+	//AddGiftedInfo(database, GiftedInfo{1, 2, 2011, "True Gift"})
+
+	tpl, _ = template.ParseGlob("templates/*.html")
+	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/registerAuth", registerAuthHandler)
+	fmt.Println("*** Listen and serve ***")
+	http.ListenAndServe("localhost:8080", nil)
+}
+
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("*** registerHandler running ***")
+	tpl.ExecuteTemplate(w, "register.html", nil)
+}
+
+func registerAuthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("*** registerAuthHandler running ***")
+	r.ParseForm()
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	fmt.Println(email, password)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	
+
 }
