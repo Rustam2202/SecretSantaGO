@@ -1,6 +1,5 @@
 package models
 
-import "time"
 
 type Person struct {
 	Id        int
@@ -12,7 +11,7 @@ type Person struct {
 
 type Event struct {
 	Id      int
-	Date    time.Time
+	name    string
 	Persons []Person
 }
 

@@ -3,10 +3,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"html/template"
 	"net/http"
-	"text/template"
+	"sqlite-golang/pkg/models/postgres"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 	//"golang.org/x/crypto/bcrypt"
 )
 
@@ -86,31 +87,41 @@ type Event struct {
 	database *sql.DB
 }
 
-var tpl *template.Template
+var tplExt *template.Template
+var DBextern *sql.DB
+var Persons *postgres.PersonModel
 
 func main() {
-
-	database, _ := sql.Open("sqlite3", "./party.db")
-	CreatePersonsTable(database)
-	CreateGiftedTable(database)
+	openDB()
 	//AddPerson(database, Person{"Jhon", "Doe"})
 	//AddGiftedInfo(database, GiftedInfo{1, 2, 2011, "True Gift"})
-	tpl, _ = template.ParseGlob("ui/templates/*.html")
+
+	tplExt, _ = template.ParseGlob("ui/templates/*.html")
 
 	http.HandleFunc("/", homeHandler)
+
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/registerAuth", registerAuthHandler)
 	fmt.Println("*** Listen and serve ***")
 	http.ListenAndServe("localhost:8080", nil)
 }
 
+func openDB() {
+	connStr := "user=postgres password=postgres dbname=SecretSantaDB sslmode=disable"
+	var err error
+	DBextern, err = sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	tpl.ExecuteTemplate(w, "index.html", nil)
+	tplExt.ExecuteTemplate(w, "index.html", nil)
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("*** registerHandler running ***")
-	tpl.ExecuteTemplate(w, "register.html", nil)
+	tplExt.ExecuteTemplate(w, "register.html", nil)
 }
 
 func registerAuthHandler(w http.ResponseWriter, r *http.Request) {
@@ -118,6 +129,10 @@ func registerAuthHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	email := r.FormValue("email")
 	password := r.FormValue("password")
-	fmt.Println(email, password)
+	firstName := r.FormValue("firstName")
+	lastName := r.FormValue("lastName")
+	Persons.Insert(email, password, firstName, lastName)
+	fmt.Println(email, password, firstName, lastName)
 	//	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
 }
