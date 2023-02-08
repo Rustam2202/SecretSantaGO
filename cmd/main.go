@@ -7,7 +7,7 @@ import (
 	"text/template"
 
 	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/crypto/bcrypt"
+	//"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -95,12 +95,17 @@ func main() {
 	CreateGiftedTable(database)
 	//AddPerson(database, Person{"Jhon", "Doe"})
 	//AddGiftedInfo(database, GiftedInfo{1, 2, 2011, "True Gift"})
+	tpl, _ = template.ParseGlob("ui/templates/*.html")
 
-	tpl, _ = template.ParseGlob("templates/*.html")
+	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/registerAuth", registerAuthHandler)
 	fmt.Println("*** Listen and serve ***")
 	http.ListenAndServe("localhost:8080", nil)
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	tpl.ExecuteTemplate(w, "index.html", nil)
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
@@ -114,7 +119,5 @@ func registerAuthHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	fmt.Println(email, password)
-	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	
-
+	//	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
