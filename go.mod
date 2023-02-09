@@ -1,4 +1,4 @@
-module sqlite-golang
+module santa
 
 go 1.19
 

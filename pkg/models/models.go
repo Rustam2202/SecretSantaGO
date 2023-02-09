@@ -4,14 +4,14 @@ package models
 type Person struct {
 	Id        int
 	Email     string
-	Passwor   string
+	Password   string
 	FirstName string
 	LastName  string
 }
 
 type Event struct {
 	Id      int
-	name    string
+	Name    string
 	Persons []Person
 }
 

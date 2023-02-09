@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"sqlite-golang/pkg/models/postgres"
+	"santa/pkg/models/postgres"
 
 	_ "github.com/lib/pq"
 	//"golang.org/x/crypto/bcrypt"
@@ -89,7 +89,7 @@ type Event struct {
 
 var tplExt *template.Template
 var DBextern *sql.DB
-var Persons *postgres.PersonModel
+var Persons *postgres.DataBase
 
 func main() {
 	openDB()
