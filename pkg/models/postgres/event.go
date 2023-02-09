@@ -13,6 +13,49 @@ type EventInterface interface {
 	createTable()
 }
 
+func (db *DataBase) createEventsTable() error {
+	query := `CREATE TABLE IF NOT EXISTS events (
+		name TEXT PRIMARY KEY,
+		persons INTEGER[]
+		)`
+	statement, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = statement.Exec()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *DataBase) dropEventsTable() error {
+	query := `DROP TABLE events`
+	statement, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = statement.Exec()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *DataBase) addEvent(eventName string, peronIDs []int) error {
+	list := "{"
+	for _, id := range peronIDs {
+		list += strconv.Itoa(id) + ", "
+	}
+	list += "}"
+	stmt := `INSERT INTO events (name, persons) VALUES($0, $1)`
+	_, err := db.DB.Exec(stmt, eventName, list) // list = '{1,2,4,5,11}'
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *EventModel) openDb() error {
 	connStr := "user=postgres password=postgres dbname=SecretSantaDB sslmode=disable"
 	var err error

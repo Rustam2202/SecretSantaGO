@@ -1,10 +1,9 @@
 package models
 
-
 type Person struct {
 	Id        int
 	Email     string
-	Password   string
+	Password  string
 	FirstName string
 	LastName  string
 }

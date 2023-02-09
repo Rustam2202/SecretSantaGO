@@ -9,10 +9,51 @@ type PersonModel struct {
 }
 
 type PersonInteface interface {
-	creatTable()
+	createTable()
 }
 
+func (db *DataBase) createPersonsTable() error {
+	query := `CREATE TABLE IF NOT EXISTS persons (
+		id SERIAL PRIMARY KEY,
+		email TEXT NOT NULL UNIQUE,
+		password TEXT NOT NULL,
+		firstname TEXT NOT NULL,
+		lastname TEXT
+		)`
+	statement, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = statement.Exec()
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
+func (db *DataBase) dropPersonsTable() error {
+	query := `DROP TABLE persons`
+	statement, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = statement.Exec()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *DataBase) addPerson(email string, password string, firstName string, lastName string) error {
+	stmt := `INSERT INTO persons (email, password, firstname, lastname) VALUES($1, $2, $3, $4)`
+	_, err := db.DB.Exec(stmt, email, password, firstName, lastName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
 func (p PersonModel) createTable() {
 	query := `CREATE TABLE IF NOT EXISTS persons (
 		id SERIAL PRIMARY KEY,
@@ -73,3 +114,4 @@ func (m *PersonModel) Edit() {
 func (m *PersonModel) Delete() {
 
 }
+*/

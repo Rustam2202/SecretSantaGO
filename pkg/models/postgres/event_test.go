@@ -4,12 +4,33 @@ import (
 	"testing"
 )
 
-func TestNewEvent(t *testing.T) {
+func TestEventsTable(t *testing.T) {
+	dataBase := DataBase{}
+	err := dataBase.openDb()
+	if err != nil {
+		t.Errorf("Databsae could not open. %s", err)
+	}
+	err = dataBase.createEventsTable()
+	if err != nil {
+		t.Errorf("Table 'events' could not be created. %s", err)
+	}
+	err = dataBase.dropEventsTable()
+	if err != nil {
+		t.Errorf("Table 'events' could not be droped. %s", err)
+	}
+}
 
-	model := Models{}
-	model.openDb()
+func TestAddEmptyEvent(t *testing.T) {
+	dataBase := DataBase{}
+	dataBase.openDb()
+	dataBase.createEventsTable()
+	err:=dataBase.addEvent("Test Event", nil)
+	if err != nil {
+		t.Errorf("'Test Event' was not added. %s", err)
+	}
+	dataBase.dropEventsTable()
+}
 
-	model.PersonModel.Insert("e@mail.com", "pass1234", "John", "Doe")
-	model.PersonModel.Insert("em@ail.com", "passwrd123", "Marry", "Sue")
-	model.PersonModel.Insert("e-m@il.com", "crocodail8", "Ted", "")
+func TestAddEvent(t *testing.T) {
+
 }
