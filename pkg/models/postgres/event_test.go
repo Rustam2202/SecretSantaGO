@@ -24,13 +24,31 @@ func TestAddEmptyEvent(t *testing.T) {
 	dataBase := DataBase{}
 	dataBase.openDb()
 	dataBase.createEventsTable()
-	err:=dataBase.addEvent("Test Event", nil)
+	err := dataBase.addEvent("Test Event", nil)
 	if err != nil {
-		t.Errorf("'Test Event' was not added. %s", err)
+		t.Errorf("Empty event was not added. %s", err)
+	}
+	dataBase.dropEventsTable()
+}
+
+func TestAddEventWithOnePerson(t *testing.T) {
+	dataBase := DataBase{}
+	dataBase.openDb()
+	dataBase.createEventsTable()
+	err := dataBase.addEvent("Test Event", []int{11})
+	if err != nil {
+		t.Errorf("Event with one person was not added. %s", err)
 	}
 	dataBase.dropEventsTable()
 }
 
 func TestAddEvent(t *testing.T) {
-
+	dataBase := DataBase{}
+	dataBase.openDb()
+	dataBase.createEventsTable()
+	err := dataBase.addEvent("Test Event", []int{1, 2, 4, 7, 11})
+	if err != nil {
+		t.Errorf("Event with persons was not added. %s", err)
+	}
+	dataBase.dropEventsTable()
 }
