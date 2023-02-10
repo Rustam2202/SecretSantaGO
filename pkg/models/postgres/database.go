@@ -6,7 +6,7 @@ type DataBase struct {
 	DB *sql.DB
 }
 
-func (db *DataBase) openDb() error {
+func (db *DataBase) OpenDb() error {
 	connStr := "user=postgres password=postgres dbname=SecretSantaDB sslmode=disable"
 	var err error
 	db.DB, err = sql.Open("postgres", connStr)
@@ -14,4 +14,12 @@ func (db *DataBase) openDb() error {
 		return err
 	}
 	return nil
+}
+
+func (db *DataBase) InitializDatabase() {
+	db.OpenDb()
+	db.createPersonsTable()
+	db.createEventsTable()
+	db.createGiftsTable()
+	db.CreateCommunitiesTable()
 }

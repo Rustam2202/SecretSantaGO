@@ -6,7 +6,7 @@ import (
 
 func TestEventsTable(t *testing.T) {
 	dataBase := DataBase{}
-	err := dataBase.openDb()
+	err := dataBase.OpenDb()
 	if err != nil {
 		t.Errorf("Databsae could not open. %s", err)
 	}
@@ -22,7 +22,7 @@ func TestEventsTable(t *testing.T) {
 
 func TestAddEmptyEvent(t *testing.T) {
 	dataBase := DataBase{}
-	dataBase.openDb()
+	dataBase.OpenDb()
 	dataBase.createEventsTable()
 	err := dataBase.addEvent("Test Event", nil)
 	if err != nil {
@@ -33,7 +33,7 @@ func TestAddEmptyEvent(t *testing.T) {
 
 func TestAddEventWithOnePerson(t *testing.T) {
 	dataBase := DataBase{}
-	dataBase.openDb()
+	dataBase.OpenDb()
 	dataBase.createEventsTable()
 	err := dataBase.addEvent("Test Event", []int{11})
 	if err != nil {
@@ -44,7 +44,7 @@ func TestAddEventWithOnePerson(t *testing.T) {
 
 func TestAddEvent(t *testing.T) {
 	dataBase := DataBase{}
-	dataBase.openDb()
+	dataBase.OpenDb()
 	dataBase.createEventsTable()
 	err := dataBase.addEvent("Test Event", []int{1, 2, 4, 7, 11})
 	if err != nil {
