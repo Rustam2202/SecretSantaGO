@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var store = sessions.NewCookieStore([]byte("cookie-store"))
 
 func (app *Application) homeHandler(w http.ResponseWriter, r *http.Request) {
 	app.tpl.ExecuteTemplate(w, "index.html", nil)
@@ -16,10 +19,49 @@ func (app *Application) registerHandler(w http.ResponseWriter, r *http.Request) 
 	app.tpl.ExecuteTemplate(w, "register.html", nil)
 }
 
+func (app *Application) loginHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("*****loginHandler running*****")
+	app.tpl.ExecuteTemplate(w, "login.html", nil)
+}
+
+func (app *Application) loginAuthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("*** loginAuthHandler running ***")
+	r.ParseForm()
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+
+	if email == "" || password == "" {
+		return
+	}
+
+	var hashPassw []byte
+	stmt := `SELECT password FROM persons WHERE email = $1`
+	row := app.db.DB.QueryRow(stmt, email)
+	err := row.Scan(&hashPassw)
+	if err != nil {
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword(hashPassw, []byte(password))
+	if err == nil {
+		fmt.Fprint(w, "Log In is succesful")
+
+		session, _ := store.Get(r, "session-name")
+		session.Values["email"] = email
+		session.Save(r, w)
+		return
+	}
+	app.tpl.ExecuteTemplate(w, "login.html", "Incorrect email or password")
+}
+
 func (app *Application) registerAuthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("*** registerAuthHandler running ***")
 	r.ParseForm()
 	email := r.FormValue("email")
+	if app.db.IsPersonExist(email) {
+		app.tpl.ExecuteTemplate(w, "register.html", "This email already exist")
+		return
+	}
 	password := r.FormValue("password")
 	firstName := r.FormValue("firstName")
 	lastName := r.FormValue("lastName")

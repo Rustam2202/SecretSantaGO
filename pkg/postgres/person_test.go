@@ -64,3 +64,20 @@ func TestDeletePerson(t *testing.T) {
 
 	dataBase.DB.Exec("DROP TABLE persons")
 }
+
+func TestExistPersn(t *testing.T) {
+	db := DataBase{}
+	db.OpenDb()
+	db.createPersonsTable()
+
+	db.AddPerson("e@mail.com", "John", "Doe", []byte{}, nil, nil)
+	db.AddPerson("em@ail.com", "Marry", "Sue", []byte{}, nil, nil)
+	db.AddPerson("e-m@il.com", "Ted", "", []byte{}, nil, nil)
+
+	if b := db.IsPersonExist("e@mail.com"); b != true {
+		t.Errorf("Expected true")
+	}
+	if b := db.IsPersonExist("non-exist@email.com"); b != false {
+		t.Errorf("Expected false")
+	}
+}

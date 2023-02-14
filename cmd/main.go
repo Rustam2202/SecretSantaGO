@@ -23,6 +23,8 @@ func main() {
 	http.HandleFunc("/", app.homeHandler)
 	http.HandleFunc("/register", app.registerHandler)
 	http.HandleFunc("/registerAuth", app.registerAuthHandler)
+	http.HandleFunc("/login", app.loginHandler)
+	http.HandleFunc("/loginAuth", app.loginAuthHandler)
 
 	// 'go run ./cmd' from root dir, thats compile both files (main.go and handlers.go)
 	fmt.Println("*** Listen and serve ***")

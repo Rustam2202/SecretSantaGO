@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>Log In</head>
+    <body>
+        <form action="/loginAuth" method="post">
+            <label for="email">E-mail:</label><br>
+            <input type="text" id="email" name="email"><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password"><br>
+            <input type="submit" value="Submit"><br>
+        </form>
+        <br>
+        {{if .}}
+        {{.}}
+        {{end }}
+    </body>
+</html>

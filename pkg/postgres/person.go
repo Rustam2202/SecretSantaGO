@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"santa/pkg/models"
 )
 
 type PersonModel struct {
@@ -58,4 +59,22 @@ func (db *DataBase) deletePerson(email string) error {
 		return err
 	}
 	return nil
+}
+
+func (db *DataBase) getPerson(email string) models.Person {
+	var person models.Person
+	stmt := `SELECT * FROM persons WHERE email = $1`
+	_, err := db.DB.Query(stmt, email)
+	if err != nil {
+		return models.Person{}
+	}
+	return person
+}
+
+func (db *DataBase) IsPersonExist(email string) bool {
+	stmt := `SELECT email FROM persons WHERE email = $1`
+	row := db.DB.QueryRow(stmt, email)
+	var em string
+	err := row.Scan(&em)
+	return err != sql.ErrNoRows
 }
