@@ -79,3 +79,15 @@ func (app *Application) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session.Save(r, w)
 	app.tpl.ExecuteTemplate(w, "login.html", "Logged Out")
 }
+
+func Auth(HandlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "session")
+		_, ok := session.Values["email"]
+		if !ok {
+			http.Redirect(w, r, "/login", 302)
+			return
+		}
+		HandlerFunc.ServeHTTP(w, r)
+	}
+}

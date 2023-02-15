@@ -1,7 +1,12 @@
 package postgres
 
 import (
+	"database/sql"
+	"santa/pkg/models"
 	"testing"
+
+	"github.com/lib/pq"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEventsTable(t *testing.T) {
@@ -28,6 +33,7 @@ func TestAddEmptyEvent(t *testing.T) {
 	if err != nil {
 		t.Errorf("Empty event was not added. %s", err)
 	}
+
 	dataBase.dropEventsTable()
 }
 
@@ -50,5 +56,41 @@ func TestAddEvent(t *testing.T) {
 	if err != nil {
 		t.Errorf("Event with persons was not added. %s", err)
 	}
+	table := checkEventsTable(dataBase.DB, "Test Event")
+	assert.Equal(t, []int{1, 2, 4, 7, 11}, table.Persons)
 	dataBase.dropEventsTable()
+}
+
+func TestAddPersonToEvent(t *testing.T) {
+	db := DataBase{}
+	db.OpenDb()
+	db.createEventsTable()
+	eventName := "Test Event"
+	db.addEvent(eventName, nil)
+	if err := db.addPersonToEvent(eventName, 5); err != nil {
+		t.Error(err)
+	}
+	if err := db.addPersonToEvent(eventName, 11); err != nil {
+		t.Error(err)
+	}
+	if err := db.addPersonToEvent(eventName, 5); err == nil {
+		t.Error("Person already exist, expected error.", err)
+	}
+	table := checkEventsTable(db.DB, eventName)
+	assert.Equal(t, eventName, table.Name)
+	assert.Equal(t, []int{5, 11}, table.Persons)
+	db.dropEventsTable()
+}
+
+func checkEventsTable(db *sql.DB, eventName string) models.Event {
+	stmt := `SELECT * FROM events WHERE name = $1`
+	row := db.QueryRow(stmt, eventName)
+	var name string
+	var personsId []sql.NullInt32
+	row.Scan(&name, pq.Array(&personsId))
+	var ids []int
+	for _, id := range personsId {
+		ids = append(ids, int(id.Int32))
+	}
+	return models.Event{Name: name, Persons: ids}
 }

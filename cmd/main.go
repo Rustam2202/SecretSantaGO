@@ -22,7 +22,7 @@ func main() {
 	app.db.InitializDatabase()
 	app.tpl, _ = template.ParseGlob("ui/templates/*.html")
 
-	http.HandleFunc("/", app.homeHandler)
+	http.HandleFunc("/", Auth(app.homeHandler))
 	http.HandleFunc("/register", app.registerHandler)
 	http.HandleFunc("/registerAuth", app.registerAuthHandler)
 	http.HandleFunc("/login", app.loginHandler)

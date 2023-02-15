@@ -6,12 +6,13 @@ type Person struct {
 	Password  string
 	FirstName string
 	LastName  string
+//	Community []int
 }
 
 type Event struct {
 	Id      int
 	Name    string
-	Persons []Person
+	Persons []int
 }
 
 type Gifts struct {

@@ -2,6 +2,9 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
+
+	"github.com/lib/pq"
 )
 
 type EventModel struct {
@@ -46,8 +49,26 @@ func (db *DataBase) addEvent(eventName string, peronIDs []int) error {
 	return nil
 }
 
-func (db *DataBase) addPersonToEvent(eventName string, personId int) {
+func (db *DataBase) addPersonToEvent(eventName string, personId int) error {
+	stmt := `SELECT persons FROM events WHERE name = $1`
+	row := db.DB.QueryRow(stmt, eventName)
 
+	var personsId []sql.NullInt32 // can't simply to Scan in []int
+	if err := row.Scan(pq.Array(&personsId)); err != nil {
+		return err
+	}
+	var ids []int
+	for _, id := range personsId {
+		if int(id.Int32) == personId {
+			return errors.New("person already exist in event")
+		}
+		ids = append(ids, int(id.Int32))
+	}
+	ids = append(ids, personId)
+
+	stmt = `UPDATE events SET persons = $2 WHERE name = $1`
+	if _, err := db.DB.Exec(stmt, eventName, makeSQLArray(ids)); err != nil {
+		return err
+	}
+	return nil
 }
-
-
