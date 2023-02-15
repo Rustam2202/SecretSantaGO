@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"santa/pkg/postgres"
 
+	"github.com/gorilla/context"
 	_ "github.com/lib/pq"
 )
 
@@ -14,6 +15,7 @@ type Application struct {
 	tpl *template.Template
 }
 
+// 'go run ./cmd' from root dir, thats compile both files (main.go and handlers.go)
 func main() {
 	var app Application
 	app.db = &postgres.DataBase{}
@@ -25,8 +27,8 @@ func main() {
 	http.HandleFunc("/registerAuth", app.registerAuthHandler)
 	http.HandleFunc("/login", app.loginHandler)
 	http.HandleFunc("/loginAuth", app.loginAuthHandler)
+	http.HandleFunc("/logout", app.logoutHandler)
 
-	// 'go run ./cmd' from root dir, thats compile both files (main.go and handlers.go)
 	fmt.Println("*** Listen and serve ***")
-	http.ListenAndServe("localhost:8080", nil)
+	http.ListenAndServe("localhost:8080", context.ClearHandler(http.DefaultServeMux))
 }
