@@ -1,18 +1,19 @@
 package models
 
 type Person struct {
-	Id        int
-	Email     string
-	Password  string
-	FirstName string
-	LastName  string
-//	Community []int
+	Id          int
+	Email       string
+	Password    string
+	FirstName   string
+	LastName    string
+	Events      []Event
+	Communities []Community
 }
 
 type Event struct {
 	Id      int
 	Name    string
-	Persons []int
+	Persons []Person
 }
 
 type Gifts struct {

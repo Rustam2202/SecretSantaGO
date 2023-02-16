@@ -88,9 +88,11 @@ func checkEventsTable(db *sql.DB, eventName string) models.Event {
 	var name string
 	var personsId []sql.NullInt32
 	row.Scan(&name, pq.Array(&personsId))
-	var ids []int
+	//var ids []int
+	var persons []models.Person
 	for _, id := range personsId {
-		ids = append(ids, int(id.Int32))
+		//ids = append(ids, int(id.Int32))
+		persons = append(persons, models.Person{Id: int(id.Int32)})
 	}
-	return models.Event{Name: name, Persons: ids}
+	return models.Event{Name: name, Persons: persons}
 }

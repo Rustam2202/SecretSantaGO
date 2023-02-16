@@ -13,8 +13,8 @@ func (db *DataBase) createPersonsTable() error {
 	query := `CREATE TABLE IF NOT EXISTS persons (
 		id SERIAL PRIMARY KEY,
 		email TEXT NOT NULL UNIQUE,
-		password BYTEA NOT NULL,
-		firstname TEXT NOT NULL,
+		password BYTEA,
+		firstname TEXT,
 		lastname TEXT,
 		events INTEGER[],
 		communities INTEGER[]
@@ -43,16 +43,19 @@ func (db *DataBase) dropPersonsTable() error {
 	return nil
 }
 
-func (db *DataBase) AddPerson(email, firstName, lastName string, password []byte, events, communities []int) error {
-	stmt := `INSERT INTO persons (email, password, firstname, lastname, events, communities) VALUES($1, $2, $3, $4, $5, $6)`
-	_, err := db.DB.Exec(stmt, email, password, firstName, lastName, makeSQLArray(events), makeSQLArray(communities))
+func (db *DataBase) AddPersonToDB(email, firstName, lastName string, password []byte,
+	events, communities []int) error {
+	stmt := `INSERT INTO persons (email, password, firstname, lastname, events, communities) 
+				VALUES($1, $2, $3, $4, $5, $6)`
+	_, err := db.DB.Exec(stmt, email, password, firstName, lastName, makeSQLArray(events),
+		makeSQLArray(communities))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (db *DataBase) deletePerson(email string) error {
+func (db *DataBase) deletePersonFromDB(email string) error {
 	stmt := `DELETE FROM  persons WHERE email = $1`
 	_, err := db.DB.Exec(stmt, email)
 	if err != nil {

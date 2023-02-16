@@ -28,6 +28,8 @@ func main() {
 	http.HandleFunc("/login", app.loginHandler)
 	http.HandleFunc("/loginAuth", app.loginAuthHandler)
 	http.HandleFunc("/logout", app.logoutHandler)
+	http.HandleFunc("/event", app.newEvent)
+	http.HandleFunc("/addPerson", app.addPersonToEventHandler)
 
 	fmt.Println("*** Listen and serve ***")
 	http.ListenAndServe("localhost:8080", context.ClearHandler(http.DefaultServeMux))

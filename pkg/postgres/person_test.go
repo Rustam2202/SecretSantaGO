@@ -23,56 +23,59 @@ func TestPersonsTable(t *testing.T) {
 }
 
 func TestAddPerson(t *testing.T) {
-	dataBase := DataBase{}
-	dataBase.OpenDb()
-	dataBase.createPersonsTable()
+	db := DataBase{}
+	db.OpenDb()
+	db.dropPersonsTable()
+	db.createPersonsTable()
 
-	if err := dataBase.AddPerson("e@mail.com", "John", "Doe", []byte{'p', 'a', 's', 1, 2, 3}, nil, nil); err != nil {
+	if err := db.AddPersonToDB("e@mail.com", "John", "Doe", []byte{'p', 'a', 's', 1, 2, 3}, nil, nil); err != nil {
 		t.Errorf("John Doe wasn't insert in database: %s", err)
 	}
-	if err := dataBase.AddPerson("em@ail.com", "Marry", "Sue", []byte{'p', 'a', 's', 'w', 'o', 'r', 'd', 1, 2, 3, 4}, []int{3, 8}, nil); err != nil {
+	if err := db.AddPersonToDB("em@ail.com", "Marry", "Sue", []byte{'p', 'a', 's', 'w', 'o', 'r', 'd', 1, 2, 3, 4}, []int{3, 8}, nil); err != nil {
 		t.Errorf("Mary Sue wasn't insert in database: %s", err)
 	}
-	if err := dataBase.AddPerson("e-m@il.com", "Ted", "", []byte{'c', 'r', 'o', 'c', 'o', 'd', 'a', 'i', 'l', '8'}, []int{6}, []int{0}); err != nil {
+	if err := db.AddPersonToDB("e-m@il.com", "Ted", "", []byte{'c', 'r', 'o', 'c', 'o', 'd', 'a', 'i', 'l', '8'}, []int{6}, []int{0}); err != nil {
 		t.Errorf("Ted wasn't insert in database: %s", err)
 	}
-
-	dataBase.DB.Exec("DROP TABLE persons")
+	if err := db.AddPersonToDB("only@email.net", "", "", []byte{}, []int{}, []int{}); err != nil {
+		t.Errorf("Ted wasn't insert in database: %s", err)
+	}
+	db.dropPersonsTable()
 }
 
 func TestDeletePerson(t *testing.T) {
-	dataBase := DataBase{}
-	dataBase.OpenDb()
-	dataBase.createPersonsTable()
+	db := DataBase{}
+	db.OpenDb()
+	db.dropPersonsTable()
+	db.createPersonsTable()
 
-	if err := dataBase.deletePerson("em@ail.com"); err != nil {
+	if err := db.deletePersonFromDB("em@ail.com"); err != nil {
 		// delete non-exist row is not error
 		t.Errorf("Something wrong with deleting non-exist person: %s", err)
 	}
 
-	dataBase.AddPerson("e@mail.com", "John", "Doe", []byte{}, nil, nil)
-	dataBase.AddPerson("em@ail.com", "Marry", "Sue", []byte{}, nil, nil)
-	dataBase.AddPerson("e-m@il.com", "Ted", "", []byte{}, nil, nil)
+	db.AddPersonToDB("e@mail.com", "John", "Doe", []byte{}, nil, nil)
+	db.AddPersonToDB("em@ail.com", "Marry", "Sue", []byte{}, nil, nil)
+	db.AddPersonToDB("e-m@il.com", "Ted", "", []byte{}, nil, nil)
 
-	if err := dataBase.deletePerson("em@ail.com"); err != nil {
+	if err := db.deletePersonFromDB("em@ail.com"); err != nil {
 		t.Errorf("Mary Sue wasn't deleted: %s", err)
 	}
-	if err := dataBase.deletePerson("em@ail.com"); err != nil {
+	if err := db.deletePersonFromDB("em@ail.com"); err != nil {
 		// delete non-exist row is not error
 		t.Errorf("Something wrong with deleting non-exist person: %s", err)
 	}
-
-	dataBase.DB.Exec("DROP TABLE persons")
+	db.dropPersonsTable()
 }
 
-func TestExistPersn(t *testing.T) {
+func TestExistPerson(t *testing.T) {
 	db := DataBase{}
 	db.OpenDb()
 	db.createPersonsTable()
 
-	db.AddPerson("e@mail.com", "John", "Doe", []byte{}, nil, nil)
-	db.AddPerson("em@ail.com", "Marry", "Sue", []byte{}, nil, nil)
-	db.AddPerson("e-m@il.com", "Ted", "", []byte{}, nil, nil)
+	db.AddPersonToDB("e@mail.com", "John", "Doe", []byte{}, nil, nil)
+	db.AddPersonToDB("em@ail.com", "Marry", "Sue", []byte{}, nil, nil)
+	db.AddPersonToDB("e-m@il.com", "Ted", "", []byte{}, nil, nil)
 
 	if b := db.IsPersonExist("e@mail.com"); b != true {
 		t.Errorf("Expected true")

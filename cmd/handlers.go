@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"santa/pkg/models"
 
 	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
@@ -66,7 +67,7 @@ func (app *Application) registerAuthHandler(w http.ResponseWriter, r *http.Reque
 	firstName := r.FormValue("firstName")
 	lastName := r.FormValue("lastName")
 	hashPassw, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	app.db.AddPerson(email, firstName, lastName, hashPassw, nil, nil)
+	app.db.AddPersonToDB(email, firstName, lastName, hashPassw, nil, nil)
 	session, _ := store.Get(r, "session")
 	session.Values["email"] = email
 	session.Save(r, w)
@@ -90,4 +91,19 @@ func Auth(HandlerFunc http.HandlerFunc) http.HandlerFunc {
 		}
 		HandlerFunc.ServeHTTP(w, r)
 	}
+}
+
+var event models.Event
+
+func (app *Application) newEvent(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	event.Name = r.FormValue("name")
+//	app.tpl.ExecuteTemplate(w, "event.html", nil)
+}
+
+func (app *Application) addPersonToEventHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	event.Persons = append(event.Persons, models.Person{Email: r.FormValue("person")})
+	fmt.Println("Person added")
 }
